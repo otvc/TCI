@@ -34,11 +34,10 @@ class TritonPythonModel:
             pixel_values = self.processor(image, return_tensors='pt').pixel_values
             param = next(self.model.parameters())
             pixel_values = pixel_values.to(param)
-            print(pixel_values)
             with torch.inference_mode():
                 output = self.model.generate(pixel_values)
-                preds = postprocessed(output)
-                np_preds = np.array(preds)
+                preds = postprocessed(output, self.processor)
+                np_preds = np.asarray([preds], dtype=object)
             output = pb_utils.InferenceResponse(
                 pb_utils.Tensor("output__0", np_preds)
             )
