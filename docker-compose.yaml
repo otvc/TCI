@@ -1,0 +1,21 @@
+services:
+  tritonserver:
+    build:
+      context: .
+      target: tritonserver
+    shm_size: '16gb'
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8002:8002
+    network_mode: "host"
+    deploy:
+      resources:
+        limits:
+          memory: 7000M
+  
+  tritonclient:
+    build:
+      context: .
+      target: tritonclient
+    network_mode: "host"
