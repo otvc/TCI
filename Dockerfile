@@ -4,13 +4,13 @@ ENV TS_VERSION=23.08
 
 WORKDIR /app/inference_triton
 
+COPY src/requirements_server.txt requirements.txt
+RUN pip install -r requirements.txt
+
 COPY ./trocr-captcha-killer ./trocr-captcha-killer
 COPY src/model.py model_repository/add_sub/1/model.py
 COPY src/config.pbtxt model_repository/add_sub/config.pbtxt
 COPY src/utils_data.py model_repository/add_sub/1/utils_data.py
-COPY src/requirements_server.txt requirements.txt
-
-RUN pip install -r requirements.txt
 
 CMD tritonserver --model-repository `pwd`/model_repository --backend-config=python,shm-default-byte-size=256777216
 

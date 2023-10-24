@@ -39,7 +39,7 @@ class TritonPythonModel:
                 preds = postprocessed(output, self.processor)
                 np_preds = np.asarray([preds], dtype=object)
             output = pb_utils.InferenceResponse(
-                pb_utils.Tensor("output__0", np_preds)
+                [pb_utils.Tensor("output__0", np_preds)]
             )
             responses.append(output)
         return responses
