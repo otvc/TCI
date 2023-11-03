@@ -18,4 +18,7 @@ services:
     build:
       context: .
       target: tritonclient
+      args:
+        model_name: 'add_sub'
+        address: 'localhost:8000'
     network_mode: "host"

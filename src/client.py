@@ -2,6 +2,9 @@ from typing import Dict, Any, NoReturn
 import json
 from pathlib import Path
 import sys
+import os
+import argparse
+import logging
 
 current_parent = Path(__file__).resolve().parent
 sys.path.append(str(current_parent))
@@ -9,8 +12,10 @@ sys.path.append(str(current_parent))
 import numpy as np
 from tritonclient import http
 
-URL = 'localhost:8000'
-MODEL_NAME = 'add_sub'
+FORMAT = '%(asctime)s %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger('dag_creator')
+logger.setLevel(logging.DEBUG)
 
 def load_json(path_file: str) -> Dict[str, Any]:
     with open(path_file, 'r') as f:
@@ -18,10 +23,12 @@ def load_json(path_file: str) -> Dict[str, Any]:
     return json_object
 
 
-def inference_test() -> NoReturn:
-    triton_client = http.InferenceServerClient(url=URL)
+def inference_test(url: str = 'localhost:8000',
+                   model_name = 'add_sub') -> NoReturn:
+    triton_client = http.InferenceServerClient(url=url)
     path_example = 'test_example.json'
     test_example = load_json(path_example)
+    logger.info("Example is loaded.")
     base64str = test_example['base64str']
     base64np = np.asarray([base64str], dtype=object)
 
@@ -40,8 +47,9 @@ def inference_test() -> NoReturn:
     )
     outputs.append(infer_output)
 
+    logger.info(f"Send message to {url} on model with name {model_name}")
     result = triton_client.infer(
-        model_name=MODEL_NAME,
+        model_name=model_name,
         inputs=inputs,
         outputs=outputs,
     )
@@ -53,4 +61,7 @@ def inference_test() -> NoReturn:
 
 
 if __name__ == '__main__':
-    inference_test()
+    logger.info("Client is initialized.")
+    address = os.environ['ADDRESS']
+    model_name = os.environ['MODEL_NAME']
+    inference_test(address, model_name)

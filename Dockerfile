@@ -18,6 +18,9 @@ FROM nvcr.io/nvidia/tritonserver:23.08-py3-sdk as tritonclient
 
 WORKDIR /app/client
 
+ARG address=localhost:8000
+ARG model_name=add_sub
+
 COPY ./src/client.py client.py
 COPY ./pyproject.toml pyproject.toml
 COPY ./data/input/test_example.json test_example.json
@@ -25,5 +28,8 @@ COPY ./data/input/test_example.json test_example.json
 RUN pip install poetry && \ 
     poetry install --only tritonclient && \
     pip install tritonclient
+
+ENV ADDRESS ${address}
+ENV MODEL_NAME ${model_name}
 
 CMD python3 client.py
